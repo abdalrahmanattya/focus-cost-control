@@ -72,7 +72,7 @@ docker compose up --build
 
 Open `http://127.0.0.1:5173`. Compose runs migrations before the worker and
 dashboard, and persists PostgreSQL data in the `postgres-data` volume. The
-dashboard is configured for local auth-disabled mode. To exercise the complete
+dashboard is configured for local auth-disabled mode. To validate the complete
 workflow, run:
 
 ```sh

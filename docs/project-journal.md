@@ -23,7 +23,7 @@ VNet-integrated but public at the platform edge (`internal_load_balancer_enabled
 dedicated private endpoints, a private-endpoint subnet, public network access
 disabled, and linked private DNS zones. The dashboard runtime uses the
 unprivileged nginx image on port 8080, with an explicit local HTTP proxy and
-cloud HTTPS proxy. Playwright now exercises the browser flow against clean
+cloud HTTPS proxy. Playwright now validates the browser flow against clean
 Compose, including upload/status, allocation and metric edits, analytics,
 export, and import-state visibility.
 
@@ -48,7 +48,7 @@ export, and import-state visibility.
   icons, red-X placeholders, black alpha backgrounds, clipping, or illegible
   diagram text.
 
-### Resume point
+### Current public status
 
 The repository was published as the public
 [`abdalrahmanattya/focus-cost-control`](https://github.com/abdalrahmanattya/focus-cost-control)
