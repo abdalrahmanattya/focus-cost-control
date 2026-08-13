@@ -5,7 +5,7 @@ RUN npm ci --ignore-scripts
 COPY . .
 RUN npm run build
 
-FROM nginxinc/nginx-unprivileged:1.27-alpine
+FROM nginxinc/nginx-unprivileged:1.29.1-alpine
 COPY --from=build /web/dist /usr/share/nginx/html
 COPY nginx.conf.template /etc/nginx/default.conf.template
 COPY config.js.template /usr/share/nginx/html/config.js.template
