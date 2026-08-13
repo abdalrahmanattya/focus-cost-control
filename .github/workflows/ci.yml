@@ -37,7 +37,7 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: aquasecurity/trivy-action@v0.28.0
+      - uses: aquasecurity/trivy-action@v0.36.0
         with: {scan-type: fs, scan-ref: '.', scanners: vuln, format: table, exit-code: '1', ignore-unfixed: true}
   image:
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
           trap 'docker rm --force focus-api' EXIT
           for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:18080/health && exit 0 || sleep 1; done
           exit 1
-      - uses: aquasecurity/trivy-action@v0.28.0
+      - uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: focus-cost-control:ci
           format: table
@@ -68,7 +68,7 @@ jobs:
         with: {name: focus-cost-control-sbom, path: focus-cost-control-sbom.spdx.json, retention-days: 7}
       - name: Build dashboard image
         run: docker build --tag focus-cost-control-web:ci web
-      - uses: aquasecurity/trivy-action@v0.28.0
+      - uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: focus-cost-control-web:ci
           format: table
