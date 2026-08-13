@@ -50,7 +50,14 @@ export, and import-state visibility.
 
 ### Resume point
 
-Run the bounded verification commands again after any review edits. Do not
-commit, push, apply Terraform, use credentials, or claim cloud smoke/destroy
-until an operator explicitly authorizes those actions and supplies protected
-environment inputs.
+The repository was published as the public
+[`abdalrahmanattya/focus-cost-control`](https://github.com/abdalrahmanattya/focus-cost-control)
+repository on `main`. Hosted CI run `31727920045` passed all five jobs,
+including the API and dashboard non-root image builds, HIGH/CRITICAL Trivy
+image gates, filesystem scan, and SBOM uploads. The final publication commits
+are present locally and on `origin/main`; no release was created.
+
+Cloud execution remains intentionally unperformed: no Azure apply, migration
+Job run, cloud smoke, destroy, credentials, or deployment occurred. Re-run
+local verification after review edits and obtain separate operator
+authorization before any cloud action.
