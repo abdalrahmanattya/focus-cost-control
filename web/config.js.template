@@ -1,0 +1,7 @@
+window.__FOCUS_CONFIG__ = {
+  apiBase: "${FOCUS_API_BASE}",
+  authMode: "${FOCUS_AUTH_MODE}",
+  entraClientId: "${FOCUS_ENTRA_CLIENT_ID}",
+  entraTenantId: "${FOCUS_ENTRA_TENANT_ID}",
+  entraApiScope: "${FOCUS_ENTRA_API_SCOPE}"
+};

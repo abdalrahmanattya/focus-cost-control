@@ -1,0 +1,2 @@
+BillingPeriodStart,BillingPeriodEnd,ProviderName,ServiceName,BilledCost,Currency,Account,Workload
+2026-03-01,2026-03-31,AWS,Storage,10,USD,prod,files

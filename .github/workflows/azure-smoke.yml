@@ -1,0 +1,60 @@
+name: azure-smoke
+on:
+  workflow_dispatch:
+    inputs: {confirm: {description: 'Type SMOKE-APPROVED', required: true, type: string}}
+permissions: {contents: read, id-token: write}
+jobs:
+  smoke:
+    if: ${{ inputs.confirm == 'SMOKE-APPROVED' }}
+    runs-on: ubuntu-latest
+    environment: azure-production
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TOKEN: ${{ secrets.SMOKE_BEARER_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=infra/azure init -input=false -backend-config=resource_group_name="${{ vars.TF_STATE_RESOURCE_GROUP }}" -backend-config=storage_account_name="${{ vars.TF_STATE_STORAGE_ACCOUNT }}" -backend-config=container_name="${{ vars.TF_STATE_CONTAINER }}" -backend-config=key="${{ vars.TF_STATE_KEY }}" -backend-config=use_oidc=true
+      - id: url
+        run: echo "url=$(terraform -chdir=infra/azure output -raw web_url)" >> "$GITHUB_OUTPUT"
+      - run: curl --fail --silent --show-error --retry 10 --retry-all-errors "$URL/health" | tee health.json
+        env:
+          URL: ${{ steps.url.outputs.url }}
+      - run: |
+          curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" "$URL/api/v1/summary" | tee summary.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" -F 'file=@fixtures/sample.csv' "$URL/api/v1/imports" | tee import-accepted.json
+          id=$(jq -r .import_id import-accepted.json)
+          for attempt in $(seq 1 30); do
+            curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" "$URL/api/v1/imports/$id" | tee import-status.json
+            status=$(jq -r .status import-status.json)
+            [ "$status" = completed ] && break
+            [ "$status" = failed -o "$status" = dead_letter ] && exit 1
+            sleep 2
+          done
+          test "$(jq -r .status import-status.json)" = completed
+          test "$(jq -r .records_inserted import-status.json)" -ge 1
+          curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" -F 'file=@fixtures/sample.csv' "$URL/api/v1/imports" | tee duplicate-accepted.json
+          duplicate_id=$(jq -r .import_id duplicate-accepted.json)
+          for attempt in $(seq 1 30); do
+            curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" "$URL/api/v1/imports/$duplicate_id" | tee duplicate-status.json
+            duplicate_status=$(jq -r .status duplicate-status.json)
+            [ "$duplicate_status" = completed ] && break
+            sleep 2
+          done
+          test "$(jq -r .duplicate_count duplicate-status.json)" -ge 1
+          curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '[{"key":"platform","percent":100}]' "$URL/api/v1/allocations" | tee allocations.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" "$URL/api/v1/forecasts" | tee forecast.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" "$URL/api/v1/anomalies" | tee anomalies.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $TOKEN" "$URL/api/v1/unit-economics" | tee unit-economics.json
+        env:
+          URL: ${{ steps.url.outputs.url }}
+      - run: printf '%s\n' '{"health":"passed","summary":"passed","credentials":"not captured"}' > smoke-evidence.json
+      - uses: actions/upload-artifact@v4
+        with: {name: azure-smoke-evidence, path: '*-evidence.json', retention-days: 7}

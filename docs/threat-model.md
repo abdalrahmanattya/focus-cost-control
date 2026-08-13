@@ -1,0 +1,3 @@
+# Threat model
+
+Untrusted CSV files are treated as data: extension, UTF-8 encoding, 10 MiB size, required headers, dates, USD currency, and numeric costs are validated. Credentials never enter fixtures or logs. In Azure, the public web Container App is the only ingress; its same-origin proxy reaches the internal API. MSAL obtains Entra bearer tokens, while the API validates issuer, audience, and operator group claims. Key Vault holds the PostgreSQL secret, managed identities access Blob/Service Bus/Key Vault through RBAC, and PostgreSQL is private through a delegated subnet and private DNS. Import malware scanning, tenant isolation, and retention remain operator deployment controls.

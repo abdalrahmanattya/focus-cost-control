@@ -1,0 +1,29 @@
+# Local-only agent instructions and secrets
+AGENTS.md
+.env*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Frontend/build artifacts
+web/node_modules/
+web/dist/
+web/.vite/
+web/test-results/
+
+# Terraform/provider state
+infra/azure/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# Evidence and local logs
+*.log
+azure-*-evidence.json
+smoke-evidence.json

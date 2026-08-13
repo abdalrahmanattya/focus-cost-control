@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Focus Cost Control local system architecture</title>
+  <desc id="desc">A numbered local flow from a browser and CSV through the FastAPI service, asynchronous worker, PostgreSQL, and deterministic analytics back to the dashboard.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#f5f7fb"/><stop offset="1" stop-color="#e9f4f1"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#102a43" flood-opacity=".14"/></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12z" fill="#26735b"/></marker>
+    <style>
+      .title{font:700 34px system-ui,-apple-system,Segoe UI,sans-serif;fill:#102a43}.subtitle{font:500 17px system-ui,-apple-system,Segoe UI,sans-serif;fill:#486581}.h{font:700 20px system-ui,-apple-system,Segoe UI,sans-serif;fill:#102a43}.body{font:500 15px system-ui,-apple-system,Segoe UI,sans-serif;fill:#334e68}.small{font:600 13px system-ui,-apple-system,Segoe UI,sans-serif;fill:#627d98}.number{font:700 17px system-ui,-apple-system,Segoe UI,sans-serif;fill:white}.edge{stroke:#26735b;stroke-width:4;fill:none;marker-end:url(#arrow)}.box{fill:white;stroke:#b8c7d9;stroke-width:2;rx:16;filter:url(#shadow)}.boundary{fill:#ffffff;fill-opacity:.62;stroke:#7cae9b;stroke-width:2;stroke-dasharray:10 8;rx:24}.pill{fill:#d9f2e6;stroke:#4f9d78;stroke-width:1.5;rx:14}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <text x="64" y="70" class="title">Focus Cost Control · local system architecture</text>
+  <text x="64" y="104" class="subtitle">Credential-free Compose mode · asynchronous FOCUS 1.4 import · deterministic analytics</text>
+
+  <rect x="48" y="145" width="1504" height="515" class="boundary"/>
+  <text x="76" y="182" class="h">Local Compose boundary</text>
+  <text x="76" y="208" class="small">The same contracts run with in-memory adapters or PostgreSQL + worker containers.</text>
+
+  <g transform="translate(90 285)">
+    <rect width="228" height="148" class="box"/>
+    <rect x="18" y="18" width="48" height="28" class="pill"/>
+    <text x="35" y="38" class="small">01</text>
+    <text x="20" y="78" class="h">Browser / CSV</text>
+    <text x="20" y="105" class="body">Upload, status polling,</text><text x="20" y="126" class="body">allocation and export.</text>
+  </g>
+  <g transform="translate(390 270)">
+    <rect width="270" height="178" class="box"/>
+    <rect x="20" y="20" width="48" height="28" class="pill"/><text x="37" y="40" class="small">02</text>
+    <text x="20" y="80" class="h">FastAPI service</text>
+    <text x="20" y="108" class="body">Auth boundary, validation,</text><text x="20" y="130" class="body">REST contracts and job state.</text>
+    <text x="20" y="158" class="small">/api/v1 · /health</text>
+  </g>
+  <g transform="translate(730 220)">
+    <rect width="245" height="130" class="box"/>
+    <rect x="20" y="18" width="48" height="28" class="pill"/><text x="37" y="38" class="small">03</text>
+    <text x="20" y="75" class="h">Async job boundary</text>
+    <text x="20" y="103" class="body">Local queue with retry</text><text x="20" y="123" class="body">and dead-letter state.</text>
+  </g>
+  <g transform="translate(730 410)">
+    <rect width="245" height="130" class="box"/>
+    <rect x="20" y="18" width="48" height="28" class="pill"/><text x="37" y="38" class="small">04</text>
+    <text x="20" y="75" class="h">Import worker</text>
+    <text x="20" y="103" class="body">Normalize, dedupe, apply</text><text x="20" y="123" class="body">late corrections, persist.</text>
+  </g>
+  <g transform="translate(1055 370)">
+    <rect width="250" height="178" class="box"/>
+    <rect x="20" y="20" width="48" height="28" class="pill"/><text x="37" y="40" class="small">05</text>
+    <text x="20" y="80" class="h">PostgreSQL</text>
+    <text x="20" y="108" class="body">Records, imports, rules,</text><text x="20" y="130" class="body">metrics and report history.</text>
+    <text x="20" y="158" class="small">migrations/001–003</text>
+  </g>
+  <g transform="translate(1370 255)">
+    <rect width="145" height="225" class="box"/>
+    <rect x="20" y="20" width="48" height="28" class="pill"/><text x="37" y="40" class="small">06</text>
+    <text x="20" y="78" class="h">Analytics</text>
+    <text x="20" y="112" class="body">Variance</text><text x="20" y="138" class="body">Forecast</text><text x="20" y="164" class="body">Anomalies</text><text x="20" y="190" class="body">Unit economics</text>
+  </g>
+
+  <path d="M318 350H390" class="edge"/><path d="M660 330H730" class="edge"/><path d="M852 350V410" class="edge"/><path d="M975 475H1055" class="edge"/><path d="M1305 410H1370" class="edge"/>
+  <path d="M1370 510C1240 625 480 625 300 435" class="edge" stroke-dasharray="9 8"/>
+  <text x="920" y="622" class="small">Read models drive the dashboard (dashed return path)</text>
+
+  <rect x="64" y="705" width="690" height="122" class="box"/>
+  <text x="92" y="742" class="h">Legend / product benefits</text>
+  <circle cx="103" cy="775" r="7" fill="#26735b"/><text x="120" y="781" class="body">Green arrows = synchronous or queued contracts</text>
+  <circle cx="103" cy="803" r="7" fill="#4f9d78"/><text x="120" y="809" class="body">Numbered steps = observable import lineage</text>
+  <rect x="810" y="705" width="742" height="122" class="box"/>
+  <text x="838" y="742" class="h">Safety properties</text>
+  <text x="838" y="775" class="body">Validated UTF-8 CSV · natural-key corrections · idempotent jobs · explicit status and DLQ</text>
+  <text x="838" y="803" class="body">Local auth is disabled only for development; production access is bearer-token protected.</text>
+  <text x="64" y="866" class="small">Azure product icons: Microsoft Azure Architecture Icons V24. This local diagram uses text-only components; cloud services are shown in the companion diagram.</text>
+</svg>

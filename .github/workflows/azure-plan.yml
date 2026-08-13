@@ -1,0 +1,43 @@
+name: azure-plan
+on:
+  workflow_dispatch:
+    inputs:
+      confirm: {description: 'Type PLAN-ONLY', required: true, type: string}
+      image: {description: 'Immutable container image digest', required: true, type: string}
+      web_image: {description: 'Immutable web image digest', required: true, type: string}
+permissions: {contents: read, id-token: write}
+jobs:
+  plan:
+    if: ${{ inputs.confirm == 'PLAN-ONLY' }}
+    runs-on: ubuntu-latest
+    environment: azure-review
+    env:
+      TF_VAR_enable_apply: "true"
+      TF_VAR_container_image: ${{ inputs.image }}
+      TF_VAR_web_image: ${{ inputs.web_image }}
+      TF_VAR_postgres_admin_password: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+      TF_VAR_entra_tenant_id: ${{ secrets.ENTRA_TENANT_ID }}
+      TF_VAR_entra_spa_client_id: ${{ secrets.ENTRA_SPA_CLIENT_ID }}
+      TF_VAR_entra_api_client_id: ${{ secrets.ENTRA_API_CLIENT_ID }}
+      TF_VAR_entra_operator_group_id: ${{ secrets.ENTRA_OPERATOR_GROUP_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_RESOURCE_GROUP_NAME: ${{ vars.TF_STATE_RESOURCE_GROUP }}
+      ARM_STORAGE_ACCOUNT_NAME: ${{ vars.TF_STATE_STORAGE_ACCOUNT }}
+      ARM_CONTAINER_NAME: ${{ vars.TF_STATE_CONTAINER }}
+      ARM_KEY: ${{ vars.TF_STATE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=infra/azure init -input=false -backend-config=resource_group_name="$ARM_RESOURCE_GROUP_NAME" -backend-config=storage_account_name="$ARM_STORAGE_ACCOUNT_NAME" -backend-config=container_name="$ARM_CONTAINER_NAME" -backend-config=key="$ARM_KEY" -backend-config=use_oidc=true
+      - run: terraform -chdir=infra/azure fmt -check -recursive
+      - run: terraform -chdir=infra/azure validate
+      - run: terraform -chdir=infra/azure plan -input=false -lock-timeout=5m -out=tfplan -var="container_image=$TF_VAR_container_image" -var="web_image=$TF_VAR_web_image" -var="postgres_admin_password=$TF_VAR_postgres_admin_password"
+      - uses: actions/upload-artifact@v4
+        with: {name: azure-plan, path: infra/azure/tfplan, retention-days: 7}

@@ -1,0 +1,30 @@
+services:
+  api:
+    build: .
+    ports: ["${FOCUS_API_PORT:-8000}:8000"]
+    environment: ["DATABASE_URL=postgresql://focus:focus@postgres:5432/focus"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck: {test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"], interval: 10s, timeout: 3s, retries: 5}
+  dashboard:
+    build: {context: ./web, dockerfile: Dockerfile}
+    ports: ["${FOCUS_DASHBOARD_PORT:-5173}:8080"]
+    environment: ["API_INTERNAL_HOST=api:8000", "API_INTERNAL_SCHEME=http"]
+    depends_on: {api: {condition: service_healthy}}
+  worker:
+    build: .
+    command: ["python", "-m", "focus_cost.local_worker"]
+    environment: ["DATABASE_URL=postgresql://focus:focus@postgres:5432/focus"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  migrate:
+    build: .
+    command: ["sh", "scripts/migrate.sh"]
+    environment: ["DATABASE_URL=postgresql://focus:focus@postgres:5432/focus"]
+    depends_on: {postgres: {condition: service_healthy}}
+  postgres:
+    image: postgres:16-alpine
+    environment: ["POSTGRES_USER=focus","POSTGRES_PASSWORD=focus","POSTGRES_DB=focus"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U focus -d focus"], interval: 5s, timeout: 3s, retries: 10}
+volumes: {pgdata: {}}
