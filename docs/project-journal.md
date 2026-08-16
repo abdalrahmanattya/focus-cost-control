@@ -1,5 +1,26 @@
 # Project journal
 
+## 2026-08-16 — publication truth-alignment review
+
+Updated the public documentation to distinguish local evidence from the
+unexecuted Azure design. The current Key Vault public-network/default-access
+risk, Terraform-state secret exposure, retention/RPO/RTO requirements, bounded
+cost gate, and protected PLAN/APPLY/MIGRATION/SMOKE/DESTROY sequence are now
+explicit. Hosted CI run 31732035428 is the authoritative pre-remediation
+baseline; run 31727920045 is superseded. The expanded revision awaits PR
+evidence. A real headless-Chrome capture of the local
+auth-disabled dashboard was visually inspected and saved as
+`docs/assets/local-ui.png`.
+
+The isolated lifecycle under `COMPOSE_PROJECT_NAME=focuse2e20260816` then
+completed successfully: Compose build/migration/import, API restart persistence,
+importer retry/DLQ (`5 passed`), and Playwright browser flow (`1 passed`) for
+upload/status, allocation, unit metric, analytics, export, and DLQ. Its stack
+and volume cleanup exited 0. This is local evidence only; no hosted or Azure
+execution is claimed.
+
+No Azure resource, credential, smoke, release, or destroy action was executed.
+
 ## 2026-08-13 — cloud-ready product path and architecture review
 
 Implemented the bounded remediation in place. The repository now has a local
@@ -52,9 +73,11 @@ export, and import-state visibility.
 
 The repository was published as the public
 [`abdalrahmanattya/focus-cost-control`](https://github.com/abdalrahmanattya/focus-cost-control)
-repository on `main`. Hosted CI run `31727920045` passed all five jobs,
-including the API and dashboard non-root image builds, HIGH/CRITICAL Trivy
-image gates, filesystem scan, and SBOM uploads. The final publication commits
+repository on `main`. Hosted CI run `31727920045` is superseded historical
+evidence; run `31732035428` is the pre-remediation hosted baseline, including
+the API and dashboard non-root image builds, HIGH/CRITICAL Trivy image gates,
+filesystem scan, and SBOM uploads. The expanded revision awaits PR evidence.
+The final publication commits
 are present locally and on `origin/main`; no release was created.
 
 Cloud execution remains intentionally unperformed: no Azure apply, migration
